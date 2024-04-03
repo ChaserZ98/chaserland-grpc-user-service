@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import AsyncIterator
 
 import grpc
 
@@ -9,21 +10,28 @@ logger = logging.getLogger("grpc")
 
 
 class AIOgRPCServer:
+    context: dict
+
     def __init__(
         self,
         address: str = app_settings.server_address,
         graceful_shutdown_timeout: int = 5,
+        lifespan: callable = None,
     ):
         self.server = grpc.aio.server()
         self.address = address
         self.graceful_shutdown_timeout = graceful_shutdown_timeout
         self.cleanup_coroutines = []
         self.loop = asyncio.get_event_loop()
+        self.lifespan = lifespan
 
         self.server.add_insecure_port(self.address)
 
     def add_servicer(self, register_func: callable, servicer):
         register_func(servicer, self.server)
+
+    def set_lifespan(self, lifespan: AsyncIterator[dict]):
+        self.lifespan = lifespan
 
     def run(self):
         try:
@@ -39,10 +47,11 @@ class AIOgRPCServer:
             "Starting graceful shutdown... Allowing 5 seconds for ongoing calls to finish"
         )
         await self.server.stop(self.graceful_shutdown_timeout)
-        logger.info("Server stopped.")
 
     async def start(self):
-        logger.info("Starting server on %s", app_settings.server_address)
-        await self.server.start()
-        self.cleanup_coroutines.append(self.graceful_shutdown())
-        await self.server.wait_for_termination()
+        async with self.lifespan(self) as context:
+            self.context = context
+            await self.server.start()
+            self.cleanup_coroutines.append(self.graceful_shutdown())
+            await self.server.wait_for_termination()
+            self.context = None
