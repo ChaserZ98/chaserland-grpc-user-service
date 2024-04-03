@@ -7,6 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+chaserland-grpc-proto = { git = "https://github.com/ChaserZ98/chaserland-grpc-proto.git", tag = "v0.2.0" }
 
 
 [build-system]
