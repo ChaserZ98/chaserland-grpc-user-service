@@ -1,0 +1,89 @@
+import os
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from chaserland_grpc_user_service.config.app import app_settings
+from chaserland_grpc_user_service.utils.log_format import ColorFormatter
+
+
+class LogSettings(BaseSettings):
+    LOG_LEVEL: str = "INFO"
+    LOG_DIRECTORY: str = "logs"
+    LOG_PATH: str = os.path.join(os.path.dirname(app_settings.BASE_PATH), LOG_DIRECTORY)
+
+    model_config = SettingsConfigDict(
+        env_prefix="APP_LOG_", env_file=".env", env_file_encoding="utf-8"
+    )
+
+    @property
+    def LOG_FORMATTERS(self) -> dict:
+        return {
+            "generic": {
+                "style": "{",
+                "format": "[{asctime}] [{process:^5d}] [{name:^18s}] [{levelname:^8s}] {message:s}",
+                "datefmt": "%Y-%m-%d %H:%M:%S %Z",
+                "class": "logging.Formatter",
+            },
+            "color_console": {
+                "style": "{",
+                "format": "[{asctime}] [{process:^5d}] [{name:^22s}] [{levelname:^20s}] {message:s}",
+                "datefmt": "%Y-%m-%d %H:%M:%S %Z",
+                "()": ColorFormatter,
+            },
+        }
+
+    @property
+    def LOG_HANDLERS(self) -> dict:
+        return {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "generic",
+                "stream": "ext://sys.stdout",
+            },
+            "color_console": {
+                "class": "logging.StreamHandler",
+                "formatter": "color_console",
+                "stream": "ext://sys.stdout",
+            },
+            "file": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "formatter": "generic",
+                "filename": os.path.join(self.LOG_PATH, "access.log"),
+                "maxBytes": 1024 * 1024 * 100,  # 100MB
+                "backupCount": 5,
+            },
+            "error_file": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "formatter": "generic",
+                "filename": os.path.join(self.LOG_PATH, "error.log"),
+                "maxBytes": 1024 * 1024 * 100,  # 100MB
+                "backupCount": 5,
+            },
+        }
+
+    @property
+    def SERVER_LOG_CONFIG(self) -> dict:
+        return {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "root": {"level": "INFO", "handlers": ["color_console"]},
+            "loggers": {
+                "grpc": {
+                    "level": self.LOG_LEVEL,
+                    "handlers": ["error_file"],
+                    "propagate": True,
+                    "qualname": "grpc",
+                },
+                "grpc.access": {
+                    "level": "INFO",
+                    "handlers": ["file"],
+                    "propagate": False,
+                    "qualname": "grpc.access",
+                },
+            },
+            "formatters": self.LOG_FORMATTERS,
+            "handlers": self.LOG_HANDLERS,
+        }
+
+
+log_settings = LogSettings()
