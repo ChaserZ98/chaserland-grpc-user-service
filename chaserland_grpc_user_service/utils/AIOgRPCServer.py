@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import AsyncIterator
+from typing import AsyncIterator, List
 
 import grpc
 
@@ -17,8 +17,9 @@ class AIOgRPCServer:
         address: str = app_settings.server_address,
         graceful_shutdown_timeout: int = 5,
         lifespan: callable = None,
+        interceptors: List[grpc.ServerInterceptor] = None,
     ):
-        self.server = grpc.aio.server()
+        self.server = grpc.aio.server(interceptors=interceptors)
         self.address = address
         self.graceful_shutdown_timeout = graceful_shutdown_timeout
         self.cleanup_coroutines = []
