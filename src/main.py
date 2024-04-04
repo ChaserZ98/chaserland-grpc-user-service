@@ -1,4 +1,4 @@
-from chaserland_grpc_user_service.bootstrap.app import create_server
+from src.bootstrap.app import create_server
 
 server = create_server()
 

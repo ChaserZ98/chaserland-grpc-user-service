@@ -1,8 +1,8 @@
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
-from chaserland_grpc_user_service.utils.AIOgRPCServer import AIOgRPCServer, logger
-from chaserland_grpc_user_service.utils.provider import Provider
+from src.utils.AIOgRPCServer import AIOgRPCServer, logger
+from src.utils.provider import Provider
 
 
 async def on_startup(app: AIOgRPCServer):

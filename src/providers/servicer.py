@@ -1,8 +1,8 @@
 from chaserland_grpc_proto.protos.user import user_pb2_grpc as user_service
 
-from chaserland_grpc_user_service.servicer.user import UserServicer
-from chaserland_grpc_user_service.utils.AIOgRPCServer import AIOgRPCServer
-from chaserland_grpc_user_service.utils.provider import Provider
+from src.servicer.user import UserServicer
+from src.utils.AIOgRPCServer import AIOgRPCServer
+from src.utils.provider import Provider
 
 
 class ServicerProvider(Provider):
