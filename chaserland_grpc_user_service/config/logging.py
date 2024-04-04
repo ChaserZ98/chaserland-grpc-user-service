@@ -12,7 +12,10 @@ class LogSettings(BaseSettings):
     LOG_PATH: str = os.path.join(os.path.dirname(app_settings.BASE_PATH), LOG_DIRECTORY)
 
     model_config = SettingsConfigDict(
-        env_prefix="APP_LOG_", env_file=".env", env_file_encoding="utf-8"
+        env_prefix="APP_LOG_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
     )
 
     @property
