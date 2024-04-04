@@ -7,7 +7,7 @@ class GithubSettings(BaseSettings):
     OAUTH_CLIENT_SECRET: SecretStr = SecretStr("")
 
     model_config = SettingsConfigDict(
-        env_prefix="GITHUB_", env_file=".env", env_file_encoding="utf-8"
+        env_prefix="GITHUB_", env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
 
