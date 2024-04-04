@@ -2,8 +2,8 @@ import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from chaserland_grpc_user_service.config.app import app_settings
-from chaserland_grpc_user_service.utils.log_format import ColorFormatter
+from src.config.app import app_settings
+from src.utils.log_format import ColorFormatter
 
 
 class LogSettings(BaseSettings):

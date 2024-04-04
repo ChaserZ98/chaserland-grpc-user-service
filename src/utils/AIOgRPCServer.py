@@ -4,7 +4,7 @@ from typing import AsyncIterator, List
 
 import grpc
 
-from chaserland_grpc_user_service.config.app import app_settings
+from src.config.app import app_settings
 
 logger = logging.getLogger("grpc")
 
