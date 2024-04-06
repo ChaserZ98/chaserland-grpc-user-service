@@ -8,4 +8,7 @@ from src.utils.provider import Provider
 class ServicerProvider(Provider):
     @staticmethod
     def register(server: AIOgRPCServer) -> None:
-        server.add_servicer(user_service.add_UserServicer_to_server, UserServicer())
+        server.add_servicer(
+            user_service.add_UserServicer_to_server,
+            UserServicer(server_context_ref=server.context_ref),
+        )
