@@ -1,22 +1,39 @@
 import asyncio
 import logging
-from typing import AsyncIterator, List
+from contextlib import AbstractAsyncContextManager
+from typing import AsyncContextManager, Callable, List, Self
 
+import aiohttp
 import grpc
+from pydantic import BaseModel, ConfigDict, Field
 
 from src.config.app import app_settings
 
 logger = logging.getLogger("grpc")
 
 
+class Context(BaseModel, AbstractAsyncContextManager):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    http_session: aiohttp.ClientSession = Field(
+        frozen=True, default_factory=aiohttp.ClientSession
+    )
+
+    async def __aenter__(self) -> Self:
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        await self.http_session.close()
+
+
 class AIOgRPCServer:
-    context: dict
+    context: Context
 
     def __init__(
         self,
         address: str = app_settings.server_address,
         graceful_shutdown_timeout: int = 5,
-        lifespan: callable = None,
+        lifespan: Callable[[Self], AsyncContextManager[Context]] = None,
         interceptors: List[grpc.ServerInterceptor] = None,
     ):
         self.server = grpc.aio.server(interceptors=interceptors)
@@ -31,7 +48,7 @@ class AIOgRPCServer:
     def add_servicer(self, register_func: callable, servicer):
         register_func(servicer, self.server)
 
-    def set_lifespan(self, lifespan: AsyncIterator[dict]):
+    def set_lifespan(self, lifespan: Callable[[Self], AsyncContextManager[Context]]):
         self.lifespan = lifespan
 
     def run(self):

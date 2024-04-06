@@ -18,7 +18,7 @@ class AsyncAccessLoggerInterceptor(AsyncServerInterceptor):
         context: grpc.ServicerContext,
         method_name: str,
     ):
-        start_time = time.time() * 1000
+        start_time = time.perf_counter() * 1000
         try:
             response_or_iterator = await method(request_or_iterator, context)
             if hasattr(response_or_iterator, "__aiter__"):
@@ -27,7 +27,7 @@ class AsyncAccessLoggerInterceptor(AsyncServerInterceptor):
                 )
             return await response_or_iterator
         finally:
-            endtime = time.time() * 1000
+            endtime = time.perf_counter() * 1000
             elapsed_time = endtime - start_time
             status_code = (
                 grpc.StatusCode(context.code())
