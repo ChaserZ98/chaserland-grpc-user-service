@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from src.utils.AIOgRPCServer import AIOgRPCServer, logger
+from src.utils.AIOgRPCServer import Context as AIOgRPCServerContext
 from src.utils.provider import Provider
 
 
@@ -14,9 +15,10 @@ async def on_shutdown(app: AIOgRPCServer):
 
 
 @asynccontextmanager
-async def lifespan(app: AIOgRPCServer) -> AsyncIterator[dict]:
+async def lifespan(app: AIOgRPCServer) -> AsyncIterator[AIOgRPCServerContext]:
     await on_startup(app)
-    yield {}
+    async with AIOgRPCServerContext() as context:
+        yield context
     await on_shutdown(app)
 
 
