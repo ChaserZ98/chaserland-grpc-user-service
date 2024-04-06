@@ -8,6 +8,7 @@ import grpc
 from pydantic import BaseModel, ConfigDict, Field
 
 from src.config.app import app_settings
+from src.utils.ref import Ref
 
 logger = logging.getLogger("grpc")
 
@@ -27,8 +28,6 @@ class Context(BaseModel, AbstractAsyncContextManager):
 
 
 class AIOgRPCServer:
-    context: Context
-
     def __init__(
         self,
         address: str = app_settings.server_address,
@@ -44,6 +43,7 @@ class AIOgRPCServer:
         self.lifespan = lifespan
 
         self.server.add_insecure_port(self.address)
+        self.context_ref: Ref[Context] = Ref()
 
     def add_servicer(self, register_func: callable, servicer):
         register_func(servicer, self.server)
@@ -68,8 +68,8 @@ class AIOgRPCServer:
 
     async def start(self):
         async with self.lifespan(self) as context:
-            self.context = context
+            self.context_ref.current = context
             await self.server.start()
             self.cleanup_coroutines.append(self.graceful_shutdown())
             await self.server.wait_for_termination()
-            self.context = None
+            self.context_ref.current = None
