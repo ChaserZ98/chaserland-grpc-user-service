@@ -1,5 +1,5 @@
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
 from src.utils.AIOgRPCServer import AIOgRPCServer, logger
 from src.utils.AIOgRPCServer import Context as AIOgRPCServerContext
