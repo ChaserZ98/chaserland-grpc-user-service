@@ -8,4 +8,6 @@ class AIOgRPCServicer:
 
     @property
     def server_context(self) -> Context:
+        if self.server_context_ref.current is None:
+            raise AttributeError("Server context is not set")
         return self.server_context_ref.current

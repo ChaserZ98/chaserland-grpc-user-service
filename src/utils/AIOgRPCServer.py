@@ -1,7 +1,8 @@
 import asyncio
 import logging
+from collections.abc import Callable
 from contextlib import AbstractAsyncContextManager
-from typing import AsyncContextManager, Callable, List, Self
+from typing import Self
 
 import aiohttp
 import grpc
@@ -32,8 +33,8 @@ class AIOgRPCServer:
         self,
         address: str = app_settings.server_address,
         graceful_shutdown_timeout: int = 5,
-        lifespan: Callable[[Self], AsyncContextManager[Context]] = None,
-        interceptors: List[grpc.ServerInterceptor] = None,
+        lifespan: Callable[[Self], AbstractAsyncContextManager[Context]] = None,
+        interceptors: list[grpc.ServerInterceptor] = None,
     ):
         self.server = grpc.aio.server(interceptors=interceptors)
         self.address = address
@@ -48,7 +49,9 @@ class AIOgRPCServer:
     def add_servicer(self, register_func: callable, servicer):
         register_func(servicer, self.server)
 
-    def set_lifespan(self, lifespan: Callable[[Self], AsyncContextManager[Context]]):
+    def set_lifespan(
+        self, lifespan: Callable[[Self], AbstractAsyncContextManager[Context]]
+    ):
         self.lifespan = lifespan
 
     def run(self):

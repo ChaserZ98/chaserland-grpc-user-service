@@ -1,6 +1,7 @@
 import logging
 import time
-from typing import Any, Callable
+from collections.abc import AsyncIterator, Callable
+from typing import Any
 
 import grpc
 from grpc_interceptor.exceptions import GrpcException
@@ -65,12 +66,22 @@ class AsyncExceptionToStatusInterceptor(AsyncServerInterceptor):
             context.set_code(e.status_code)
             context.set_details(e.details)
             raise
+        except Exception as e:
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(str(e))
+            raise
 
-    async def _intercept_streaming(self, iterator, context):
+    async def _intercept_streaming(
+        self, iterator: AsyncIterator, context: grpc.ServicerContext
+    ):
         try:
             async for r in iterator:
                 yield r
         except GrpcException as e:
             context.set_code(e.status_code)
             context.set_details(e.details)
+            raise
+        except Exception as e:
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(str(e))
             raise
