@@ -4,7 +4,7 @@ from collections.abc import AsyncIterator, Callable
 from typing import Any
 
 import grpc
-from grpc_interceptor.exceptions import GrpcException
+import grpc_interceptor.exceptions as grpc_exceptions
 from grpc_interceptor.server import AsyncServerInterceptor
 
 
@@ -19,6 +19,13 @@ class AsyncAccessLoggerInterceptor(AsyncServerInterceptor):
         context: grpc.ServicerContext,
         method_name: str,
     ):
+        metadata = dict(context.invocation_metadata())
+        if "rpc-id" not in metadata:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("rpc-id is not set")
+            raise grpc_exceptions.InvalidArgument("rpc-id is not set")
+
+        rpc_id = metadata["rpc-id"]
         start_time = time.perf_counter() * 1000
         try:
             response_or_iterator = await method(request_or_iterator, context)
@@ -36,14 +43,14 @@ class AsyncAccessLoggerInterceptor(AsyncServerInterceptor):
                 else grpc.StatusCode.OK
             )
             self.logger.info(
-                f'{context.peer()} - "{method_name}" {status_code.value[0]} {status_code.name} {elapsed_time:.2f}ms'
+                f'{context.peer()} - {rpc_id} - "{method_name}" {status_code.value[0]} {status_code.name} "{context.details()}" {elapsed_time:.2f}ms'
             )
 
     async def _intercept_streaming(self, iterator, context: grpc.ServicerContext):
         try:
             async for r in iterator:
                 yield r
-        except GrpcException as e:
+        except grpc_exceptions.GrpcException as e:
             context.set_code(e.status_code)
             context.set_details(e.details)
             raise
@@ -62,7 +69,7 @@ class AsyncExceptionToStatusInterceptor(AsyncServerInterceptor):
             if hasattr(response_or_iterator, "__aiter__"):
                 return self._intercept_streaming(response_or_iterator, context)
             return await response_or_iterator
-        except GrpcException as e:
+        except grpc_exceptions.GrpcException as e:
             context.set_code(e.status_code)
             context.set_details(e.details)
             raise
@@ -77,7 +84,7 @@ class AsyncExceptionToStatusInterceptor(AsyncServerInterceptor):
         try:
             async for r in iterator:
                 yield r
-        except GrpcException as e:
+        except grpc_exceptions.GrpcException as e:
             context.set_code(e.status_code)
             context.set_details(e.details)
             raise
