@@ -22,5 +22,14 @@ class OAuthBase(BaseModel):
     oauth_scope: str | None
 
 
+class OAuthUpdate(BaseModel):
+    oauth_token_type: str
+    oauth_access_token: str
+    oauth_refresh_token: str | None
+    oauth_issue_at: int
+    oauth_expires_at: int | None
+    oauth_scope: str | None
+
+
 class OAuthCreate(OAuthBase):
     pass
