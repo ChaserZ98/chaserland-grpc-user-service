@@ -40,19 +40,20 @@ class AIOgRPCServer:
         graceful_shutdown_timeout: int = 5,
         lifespan: Callable[[Self], AbstractAsyncContextManager[Context]] = None,
         interceptors: list[grpc.ServerInterceptor] = None,
+        loop: asyncio.AbstractEventLoop = None,
     ):
-        self.server = grpc.aio.server(interceptors=interceptors)
+        self.interceptors = interceptors
         self.address = address
         self.graceful_shutdown_timeout = graceful_shutdown_timeout
         self.cleanup_coroutines = []
-        self.loop = asyncio.get_event_loop()
         self.lifespan = lifespan
-
-        self.server.add_insecure_port(self.address)
         self.context_ref: Ref[Context] = Ref()
+        self.servicers = []
 
-    def add_servicer(self, register_func: callable, servicer):
-        register_func(servicer, self.server)
+        self.loop = loop or asyncio.get_event_loop()
+
+    def add_servicer(self, register_func: Callable, servicer):
+        self.servicers.append((register_func, servicer))
 
     def set_lifespan(
         self, lifespan: Callable[[Self], AbstractAsyncContextManager[Context]]
@@ -75,6 +76,14 @@ class AIOgRPCServer:
         await self.server.stop(self.graceful_shutdown_timeout)
 
     async def start(self):
+        self.server = grpc.aio.server(interceptors=self.interceptors)
+        self.server.add_insecure_port(self.address)
+        logger.info(f"Server created on {self.address}.")
+
+        for register_func, servicer in self.servicers:
+            register_func(servicer, self.server)
+            logger.info(f"Servicer {servicer.__class__.__name__} added.")
+
         async with self.lifespan(self) as context:
             self.context_ref.current = context
             await self.server.start()
