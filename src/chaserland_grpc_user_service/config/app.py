@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -8,7 +9,7 @@ class Settings(BaseSettings):
     ENV: str = "prod"
     DEBUG: bool = False
 
-    BASE_PATH: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    BASE_PATH: str = str(Path(os.path.abspath(__file__)).parents[2])
 
     HOST: str = "[::]"
     PORT: int = 50051
