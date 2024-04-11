@@ -12,6 +12,8 @@ pydantic-settings = "^2.2.1"
 chaserland-grpc-proto = { git = "https://github.com/ChaserZ98/chaserland-grpc-proto.git", tag = "v0.2.0" }
 grpc-interceptor = "^0.15.4"
 aiohttp = "^3.9.3"
+sqlalchemy = "^2.0.29"
+asyncpg = "^0.29.0"
 
 
 [build-system]
