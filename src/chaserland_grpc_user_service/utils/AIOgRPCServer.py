@@ -45,7 +45,6 @@ class AIOgRPCServer:
         self.interceptors = interceptors
         self.address = address
         self.graceful_shutdown_timeout = graceful_shutdown_timeout
-        self.cleanup_coroutines = []
         self.lifespan = lifespan
         self.context_ref: Ref[Context] = Ref()
         self.servicers = []
@@ -66,7 +65,7 @@ class AIOgRPCServer:
         except KeyboardInterrupt:
             logger.info("KeyboardInterrupt received.")
         finally:
-            self.loop.run_until_complete(asyncio.gather(*self.cleanup_coroutines))
+            self.loop.run_until_complete(self.graceful_shutdown())
             self.loop.close()
 
     async def graceful_shutdown(self):
@@ -87,6 +86,5 @@ class AIOgRPCServer:
         async with self.lifespan(self) as context:
             self.context_ref.current = context
             await self.server.start()
-            self.cleanup_coroutines.append(self.graceful_shutdown())
             await self.server.wait_for_termination()
             self.context_ref.current = None
