@@ -8,7 +8,7 @@ from ..utils.provider import Provider
 
 
 async def on_startup(app: AIOgRPCServer):
-    logger.info("Starting server on %s", app.address)
+    logger.info(f"Starting server on {app.address}...")
     logger.info("Initializing db models...")
     await init_models()
 
