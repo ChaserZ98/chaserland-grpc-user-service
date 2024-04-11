@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["ChaserZ98 <feiyuzheng98@gmail.com>"]
 readme = "README.md"
+packages = [{ include = "chaserland_grpc_user_service", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
