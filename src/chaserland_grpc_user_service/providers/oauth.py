@@ -1,9 +1,9 @@
 import aiohttp
-from api.github.rest.oauth_user import getOAuthUser
 
-from src.api.github.rest.oauth_token import checkOAuthToken, getOAuthToken
-from src.config.github import github_settings
-from src.utils.provider import OAuthProvider
+from ..api.github.rest.oauth_token import checkOAuthToken, getOAuthToken
+from ..api.github.rest.oauth_user import getOAuthUser
+from ..config.github import github_settings
+from ..utils.provider import OAuthProvider
 
 
 class GithubOAuthProvider(OAuthProvider):

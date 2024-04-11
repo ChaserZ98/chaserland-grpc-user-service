@@ -1,5 +1,5 @@
-from src.utils.AIOgRPCServer import Context
-from src.utils.ref import Ref
+from .AIOgRPCServer import Context
+from .ref import Ref
 
 
 class AIOgRPCServicer:

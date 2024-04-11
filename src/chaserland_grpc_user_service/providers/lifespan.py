@@ -1,13 +1,16 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from src.utils.AIOgRPCServer import AIOgRPCServer, logger
-from src.utils.AIOgRPCServer import Context as AIOgRPCServerContext
-from src.utils.provider import Provider
+from ..db.database import init_models
+from ..utils.AIOgRPCServer import AIOgRPCServer, logger
+from ..utils.AIOgRPCServer import Context as AIOgRPCServerContext
+from ..utils.provider import Provider
 
 
 async def on_startup(app: AIOgRPCServer):
     logger.info("Starting server on %s", app.address)
+    logger.info("Initializing db models...")
+    await init_models()
 
 
 async def on_shutdown(app: AIOgRPCServer):

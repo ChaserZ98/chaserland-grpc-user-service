@@ -1,12 +1,12 @@
-from src.providers.lifespan import LifespanProvider
-from src.providers.log import LoggingProvider
-from src.providers.servicer import ServicerProvider
-from src.utils.AIOgRPCServer import AIOgRPCServer, logger
-from src.utils.interceptors import (
+from ..providers.lifespan import LifespanProvider
+from ..providers.log import LoggingProvider
+from ..providers.servicer import ServicerProvider
+from ..utils.AIOgRPCServer import AIOgRPCServer, logger
+from ..utils.interceptors import (
     AsyncAccessLoggerInterceptor,
     AsyncExceptionToStatusInterceptor,
 )
-from src.utils.provider import Provider
+from ..utils.provider import Provider
 
 
 def create_server() -> AIOgRPCServer:

@@ -3,10 +3,10 @@ import urllib.parse
 
 import aiohttp
 
-from src.api.github.base_url import API_BASE_URL, OAUTH_BASE_URL
-from src.api.github.exceptions import GithubApiException
-from src.api.github.schemas import GithubOAuthToken
-from src.api.github.version import VERSION as GITHUB_API_VERSION
+from ..base_url import API_BASE_URL, OAUTH_BASE_URL
+from ..exceptions import GithubApiException
+from ..schemas import GithubOAuthToken
+from ..version import VERSION as GITHUB_API_VERSION
 
 
 def githubApiOAuthTokenExchangeEndpoint(

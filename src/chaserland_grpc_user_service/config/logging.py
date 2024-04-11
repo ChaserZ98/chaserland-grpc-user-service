@@ -2,8 +2,8 @@ import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from src.config.app import app_settings
-from src.utils.log_format import ColorFormatter
+from ..utils.log_format import ColorFormatter
+from .app import app_settings
 
 
 class LogSettings(BaseSettings):

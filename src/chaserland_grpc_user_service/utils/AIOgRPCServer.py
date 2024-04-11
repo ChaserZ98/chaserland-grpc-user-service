@@ -7,9 +7,11 @@ from typing import Self
 import aiohttp
 import grpc
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from src.config.app import app_settings
-from src.utils.ref import Ref
+from ..config.app import app_settings
+from ..db.database import async_session
+from .ref import Ref
 
 logger = logging.getLogger("grpc")
 
@@ -19,6 +21,9 @@ class Context(BaseModel, AbstractAsyncContextManager):
 
     http_session: aiohttp.ClientSession = Field(
         frozen=True, default_factory=aiohttp.ClientSession
+    )
+    db_session: async_sessionmaker[AsyncSession] = Field(
+        frozen=True, default_factory=async_session
     )
 
     async def __aenter__(self) -> Self:

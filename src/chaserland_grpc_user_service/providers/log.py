@@ -1,8 +1,8 @@
 import logging.config
 
-from src.config.logging import log_settings
-from src.utils.AIOgRPCServer import AIOgRPCServer
-from src.utils.provider import Provider
+from ..config.logging import log_settings
+from ..utils.AIOgRPCServer import AIOgRPCServer
+from ..utils.provider import Provider
 
 
 class LoggingProvider(Provider):
