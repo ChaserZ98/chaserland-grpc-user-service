@@ -10,6 +10,7 @@ class PostgresSettings(BaseSettings):
     HOST: SecretStr = SecretStr("")
     PORT: str = "5432"
     NAME: SecretStr = SecretStr("")
+    SCHEMA: SecretStr = SecretStr("")
 
     model_config = SettingsConfigDict(
         env_prefix="POSTGRES_",
