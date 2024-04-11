@@ -4,7 +4,7 @@ from collections.abc import AsyncIterator, Callable
 from typing import Any
 
 import grpc
-from grpc_interceptor.exceptions import GrpcException
+import grpc_interceptor.exceptions as grpc_exceptions
 from grpc_interceptor.server import AsyncServerInterceptor
 
 
@@ -23,7 +23,7 @@ class AsyncAccessLoggerInterceptor(AsyncServerInterceptor):
         if "rpc-id" not in metadata:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             context.set_details("rpc-id is not set")
-            raise GrpcException(grpc.StatusCode.INVALID_ARGUMENT, "rpc-id is not set")
+            raise grpc_exceptions.InvalidArgument("rpc-id is not set")
 
         rpc_id = metadata["rpc-id"]
         start_time = time.perf_counter() * 1000
@@ -50,7 +50,7 @@ class AsyncAccessLoggerInterceptor(AsyncServerInterceptor):
         try:
             async for r in iterator:
                 yield r
-        except GrpcException as e:
+        except grpc_exceptions.GrpcException as e:
             context.set_code(e.status_code)
             context.set_details(e.details)
             raise
@@ -69,7 +69,7 @@ class AsyncExceptionToStatusInterceptor(AsyncServerInterceptor):
             if hasattr(response_or_iterator, "__aiter__"):
                 return self._intercept_streaming(response_or_iterator, context)
             return await response_or_iterator
-        except GrpcException as e:
+        except grpc_exceptions.GrpcException as e:
             context.set_code(e.status_code)
             context.set_details(e.details)
             raise
@@ -84,7 +84,7 @@ class AsyncExceptionToStatusInterceptor(AsyncServerInterceptor):
         try:
             async for r in iterator:
                 yield r
-        except GrpcException as e:
+        except grpc_exceptions.GrpcException as e:
             context.set_code(e.status_code)
             context.set_details(e.details)
             raise
