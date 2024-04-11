@@ -33,3 +33,13 @@ async def create_user_with_oauth(
 
     await db.refresh(db_user)
     return db_user
+
+
+async def update_oauth_user(
+    oauth_user: models.OAuth, db: AsyncSession, oauth_patch: schemas.OAuthUpdate
+):
+    async with db.begin():
+        for key, value in oauth_patch.model_dump().items():
+            setattr(oauth_user, key, value)
+    await db.refresh(oauth_user)
+    return oauth_user
