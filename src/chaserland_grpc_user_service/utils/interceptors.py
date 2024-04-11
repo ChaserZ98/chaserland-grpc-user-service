@@ -19,6 +19,13 @@ class AsyncAccessLoggerInterceptor(AsyncServerInterceptor):
         context: grpc.ServicerContext,
         method_name: str,
     ):
+        metadata = dict(context.invocation_metadata())
+        if "rpc-id" not in metadata:
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details("rpc-id is not set")
+            raise GrpcException(grpc.StatusCode.INVALID_ARGUMENT, "rpc-id is not set")
+
+        rpc_id = metadata["rpc-id"]
         start_time = time.perf_counter() * 1000
         try:
             response_or_iterator = await method(request_or_iterator, context)
@@ -36,7 +43,7 @@ class AsyncAccessLoggerInterceptor(AsyncServerInterceptor):
                 else grpc.StatusCode.OK
             )
             self.logger.info(
-                f'{context.peer()} - "{method_name}" {status_code.value[0]} {status_code.name} {elapsed_time:.2f}ms'
+                f'{context.peer()} - {rpc_id} - "{method_name}" {status_code.value[0]} {status_code.name} "{context.details()}" {elapsed_time:.2f}ms'
             )
 
     async def _intercept_streaming(self, iterator, context: grpc.ServicerContext):
