@@ -1,2 +1,2 @@
-from api.github.base_url import *
-from version import VERSION
+from .base_url import *
+from .version import VERSION
