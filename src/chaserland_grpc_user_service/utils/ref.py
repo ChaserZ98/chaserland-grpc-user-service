@@ -1,9 +1,4 @@
-from typing import Generic, TypeVar
-
-T = TypeVar("T")
-
-
-class Ref(Generic[T]):
+class Ref[T]:
     def __init__(self, current: T = None) -> None:
         self.current = current
 
