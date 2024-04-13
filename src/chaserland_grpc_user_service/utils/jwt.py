@@ -2,32 +2,17 @@ from __future__ import annotations
 
 import base64
 import json
+from dataclasses import dataclass
 
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import ECC
 from Crypto.Signature import DSS
 
 
+@dataclass
 class JWTBearer:
-    def __init__(self, access_token: str, token_type: str) -> None:
-        self.access_token = access_token
-        self.token_type = token_type
-
-    @property
-    def access_token(self):
-        return self._access_token
-
-    @access_token.setter
-    def access_token(self, value: str):
-        self._access_token = value
-
-    @property
-    def token_type(self):
-        return self._token_type
-
-    @token_type.setter
-    def token_type(self, value: str):
-        self._token_type = value
+    access_token: str
+    token_type: str
 
     def to_jwt(self, encoding="utf-8") -> JWT:
         header, payload, _ = self.access_token.split(".")
@@ -60,22 +45,10 @@ class JWTBearer:
             return False
 
 
+@dataclass
 class JWTHeader:
-    def __init__(self, alg: str, typ: str = "JWT") -> None:
-        self.alg = alg
-        self.typ = typ
-
-    @property
-    def alg(self):
-        return self._alg
-
-    @alg.setter
-    def alg(self, value: str):
-        self._alg = value
-
-    @property
-    def typ(self):
-        return self._typ
+    alg: str
+    typ: str = "JWT"
 
     def to_urlsafe_base64(self, encoding: str = "utf-8") -> str:
         return JWT.encode(self.model_dump(), encoding=encoding)
@@ -86,26 +59,10 @@ class JWTPayload(dict):
         return JWT.encode(self, encoding=encoding)
 
 
+@dataclass
 class JWT:
-    def __init__(self, header: JWTHeader, payload: JWTPayload) -> None:
-        self.header = header
-        self.payload = payload
-
-    @property
-    def header(self):
-        return self._header
-
-    @header.setter
-    def header(self, value: JWTHeader):
-        self._header = value
-
-    @property
-    def payload(self):
-        return self._payload
-
-    @payload.setter
-    def payload(self, value: JWTPayload):
-        self._payload = value
+    header: JWTHeader
+    payload: JWTPayload
 
     @staticmethod
     def encode(data: dict | bytes, encoding: str = "utf-8") -> str:
