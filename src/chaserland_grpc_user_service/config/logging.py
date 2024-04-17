@@ -1,8 +1,8 @@
 import os
 
+from chaserland_common.logger import ColorFormatter
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from ..utils.log_format import ColorFormatter
 from .app import app_settings
 
 

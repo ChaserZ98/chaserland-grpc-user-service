@@ -1,11 +1,12 @@
 import logging.config
 
+from chaserland_common.grpc import AbstractProvider
+from chaserland_common.grpc.aio import Server as AIOgRPCServer
+
 from ..config.logging import log_settings
-from ..utils.AIOgRPCServer import AIOgRPCServer
-from ..utils.provider import Provider
 
 
-class LoggingProvider(Provider):
+class LoggingProvider(AbstractProvider):
     @staticmethod
     def register(app: AIOgRPCServer):
         logging.config.dictConfig(log_settings.SERVER_LOG_CONFIG)
