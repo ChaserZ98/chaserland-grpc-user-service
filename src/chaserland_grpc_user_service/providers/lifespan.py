@@ -12,6 +12,7 @@ async def on_startup(app: AIOgRPCServer):
     logger.info(f"Starting server on {app.address}...")
     logger.info("Initializing db models...")
     await init_models()
+    logger.info("Server ready to accept connections.")
 
 
 async def on_shutdown(app: AIOgRPCServer):
