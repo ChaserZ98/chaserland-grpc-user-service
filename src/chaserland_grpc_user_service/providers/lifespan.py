@@ -1,10 +1,11 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+from chaserland_common.grpc import AbstractProvider, logger
+from chaserland_common.grpc.aio import Server as AIOgRPCServer
+
+from ..core.context import Context as AIOgRPCServerContext
 from ..db.database import init_models
-from ..utils.AIOgRPCServer import AIOgRPCServer, logger
-from ..utils.AIOgRPCServer import Context as AIOgRPCServerContext
-from ..utils.provider import Provider
 
 
 async def on_startup(app: AIOgRPCServer):
@@ -25,7 +26,7 @@ async def lifespan(app: AIOgRPCServer) -> AsyncIterator[AIOgRPCServerContext]:
     await on_shutdown(app)
 
 
-class LifespanProvider(Provider):
+class LifespanProvider(AbstractProvider):
     @staticmethod
     def register(app: AIOgRPCServer):
         app.set_lifespan(lifespan)

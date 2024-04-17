@@ -14,10 +14,3 @@ class OAuthProvider(ABC):
     @abstractmethod
     async def check_token(self, access_token: str, session: Any):
         raise NotImplementedError
-
-
-class Provider(ABC):
-    @staticmethod
-    @abstractmethod
-    def register(server):
-        raise NotImplementedError

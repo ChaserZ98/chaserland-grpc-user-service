@@ -2,15 +2,15 @@ from datetime import datetime, timezone
 
 import grpc
 import grpc_interceptor.exceptions as grpc_exceptions
+from chaserland_common.grpc import BaseServicer as AIOgRPCServicer
+from chaserland_common.jwt import JWT, JWTHeader, JWTPayload
 from chaserland_grpc_proto.protos.user import user_pb2 as user_message
 from chaserland_grpc_proto.protos.user import user_pb2_grpc as user_service
 
 from ..config.jwt import jwt_settings
 from ..db import crud, schemas
 from ..providers.oauth import GithubOAuthProvider
-from ..utils.jwt import JWT, JWTHeader, JWTPayload
 from ..utils.provider import OAuthProvider
-from ..utils.servicer import AIOgRPCServicer
 
 
 class UserServicer(user_service.UserServicer, AIOgRPCServicer):

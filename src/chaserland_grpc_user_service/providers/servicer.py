@@ -1,12 +1,12 @@
+from chaserland_common.grpc import AbstractProvider
+from chaserland_common.grpc.aio import Server as AIOgRPCServer
 from chaserland_grpc_proto.protos.user import user_pb2_grpc as user_service
 
 from ..servicer.user import UserServicer
-from ..utils.AIOgRPCServer import AIOgRPCServer
-from ..utils.provider import Provider
 from .oauth import GithubOAuthProvider
 
 
-class ServicerProvider(Provider):
+class ServicerProvider(AbstractProvider):
     @staticmethod
     def register(server: AIOgRPCServer) -> None:
         oauth_providers = [
