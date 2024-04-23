@@ -8,6 +8,7 @@ from chaserland_grpc_proto.protos.user import user_pb2 as user_message
 from chaserland_grpc_proto.protos.user import user_pb2_grpc as user_service
 
 from ..config.jwt import jwt_settings
+from ..core.context import Context
 from ..db import crud, schemas
 from ..providers.oauth import GithubOAuthProvider
 from ..utils.provider import OAuthProvider
@@ -16,6 +17,10 @@ from ..utils.provider import OAuthProvider
 class UserServicer(user_service.UserServicer, AIOgRPCServicer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    @property
+    def server_context(self) -> Context:
+        return super().server_context
 
     @property
     def github_oauth_provider(self):
