@@ -92,7 +92,7 @@ class UserServicer(user_service.UserServicer, AIOgRPCServicer):
 
             jwt_header = JWTHeader(alg=jwt_settings.ALGORITHM)
             jwt_payload = JWTPayload(
-                id=db_user.id,
+                id=str(db_user.id),
                 scopes=db_user.scopes if db_user.scopes else [],
                 name=name,
                 email=email,
