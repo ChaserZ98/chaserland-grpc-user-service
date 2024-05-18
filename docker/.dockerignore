@@ -1,0 +1,18 @@
+# git
+.git
+.gitattribute
+.gitignore
+
+# github
+.github
+
+# python
+.venv
+
+# docker
+docker/
+
+# other
+logs/
+tests/
+.env
