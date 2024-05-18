@@ -58,6 +58,7 @@ pipeline {
         BUILD_TITLE = ''
         DURATION = ''
         DISCORD_USERNAME = 'ChaserLand CI'
+        CHASERLAND_GRPC_USER_SERVICE_WORKSPACE = "${WORKSPACE}"
     }
     stages {
         stage('pre-build') {
@@ -91,11 +92,38 @@ pipeline {
             when {
                 branch 'dev'
             }
+            environment {
+                CHASERLAND_GRPC_USER_SERVICE_VERSION = "${VERSION}"
+            }
             steps {
                 script{
                     setLastStage()
                 }
-                echo 'Building dev branch...'
+                echo "Start building ${BRANCH_NAME} branch..."
+                sh 'docker compose -f $DOCKER_CONFIG_FILE -p $DOCKER_PROJECT build chaserland-grpc-user-service'
+                echo "Finish building ${BRANCH_NAME} branch!"
+
+                echo "Replace the latest image tag with the current commit sha..."
+                sh "docker tag chaserland/chaserland-grpc-user-service:${VERSION} chaserland/chaserland-grpc-user-service:${BRANCH_NAME}"
+                echo "Finish replacing the latest image tag with the current commit sha!"
+
+                echo "Clear outdated images..."
+                sh '''
+                    MAX_TAGS=5
+                    echo $BRANCH_NAME
+                    TAGS=$(docker images --format "{{.Repository}}:{{.Tag}} {{.CreatedAt}}" "chaserland/chaserland-grpc-user-service:$BRANCH_NAME-*" | 
+                    sort -k 2 -r | 
+                    awk '{print $1}' |
+                    tail -n +$((MAX_TAGS+1)))
+                    if [ ! -z "$TAGS" ]; then
+                        echo "Outdated images found!"
+                        echo "Removing outdated images..."
+                        docker rmi -f $TAGS
+                        echo "Successfully removed outdated images!"
+                    else
+                        echo "No outdated images found!"
+                    fi
+                '''
             }
         }
         stage('Build feature/jenkins'){
@@ -107,6 +135,44 @@ pipeline {
                     setLastStage()
                 }
                 echo 'Building feature/jenkins branch...'
+            }
+        }
+        stage('Build feature/docker'){
+            when {
+                branch 'feature/docker'
+            }
+            environment {
+                CHASERLAND_GRPC_USER_SERVICE_VERSION = "${VERSION}"
+            }
+            steps {
+                script{
+                    setLastStage()
+                }
+                echo "Start building ${BRANCH_NAME} branch..."
+                sh 'docker compose -f $DOCKER_CONFIG_FILE -p $DOCKER_PROJECT build chaserland-grpc-user-service'
+                echo "Finish building ${BRANCH_NAME} branch!"
+
+                echo "Replace the latest image tag with the current commit sha..."
+                sh "docker tag chaserland/chaserland-grpc-user-service:${VERSION} chaserland/chaserland-grpc-user-service:${BRANCH_NAME}"
+                echo "Finish replacing the latest image tag with the current commit sha!"
+
+                echo "Clear outdated images..."
+                sh '''
+                    MAX_TAGS=5
+                    echo $BRANCH_NAME
+                    TAGS=$(docker images --format "{{.Repository}}:{{.Tag}} {{.CreatedAt}}" "chaserland/chaserland-grpc-user-service:$BRANCH_NAME-*" | 
+                    sort -k 2 -r | 
+                    awk '{print $1}' |
+                    tail -n +$((MAX_TAGS+1)))
+                    if [ ! -z "$TAGS" ]; then
+                        echo "Outdated images found!"
+                        echo "Removing outdated images..."
+                        docker rmi -f $TAGS
+                        echo "Successfully removed outdated images!"
+                    else
+                        echo "No outdated images found!"
+                    fi
+                '''
             }
         }
     }
