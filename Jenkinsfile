@@ -142,7 +142,7 @@ pipeline {
                 branch 'feature/docker'
             }
             environment {
-                CHASERLAND_GRPC_USER_SERVICE_VERSION = "${VERSION}"
+                CHASERLAND_GRPC_USER_SERVICE_VERSION = "test-${COMMIT_SHA}"
             }
             steps {
                 script{
@@ -153,7 +153,7 @@ pipeline {
                 echo "Finish building ${BRANCH_NAME} branch!"
 
                 echo "Replace the latest image tag with the current commit sha..."
-                sh "docker tag chaserland/chaserland-grpc-user-service:test-${COMMIT_SHA} chaserland/chaserland-grpc-user-service:test"
+                sh "docker tag chaserland/chaserland-grpc-user-service:${CHASERLAND_GRPC_USER_SERVICE_VERSION} chaserland/chaserland-grpc-user-service:test"
                 echo "Finish replacing the latest image tag with the current commit sha!"
 
                 echo "Clear outdated images..."
