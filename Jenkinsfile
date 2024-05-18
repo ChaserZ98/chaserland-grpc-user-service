@@ -153,14 +153,14 @@ pipeline {
                 echo "Finish building ${BRANCH_NAME} branch!"
 
                 echo "Replace the latest image tag with the current commit sha..."
-                sh "docker tag chaserland/chaserland-grpc-user-service:${VERSION} chaserland/chaserland-grpc-user-service:${BRANCH_NAME}"
+                sh "docker tag chaserland/chaserland-grpc-user-service:test-${COMMIT_SHA} chaserland/chaserland-grpc-user-service:test"
                 echo "Finish replacing the latest image tag with the current commit sha!"
 
                 echo "Clear outdated images..."
                 sh '''
                     MAX_TAGS=5
                     echo $BRANCH_NAME
-                    TAGS=$(docker images --format "{{.Repository}}:{{.Tag}} {{.CreatedAt}}" "chaserland/chaserland-grpc-user-service:$BRANCH_NAME-*" | 
+                    TAGS=$(docker images --format "{{.Repository}}:{{.Tag}} {{.CreatedAt}}" "chaserland/chaserland-grpc-user-service:test-*" | 
                     sort -k 2 -r | 
                     awk '{print $1}' |
                     tail -n +$((MAX_TAGS+1)))
