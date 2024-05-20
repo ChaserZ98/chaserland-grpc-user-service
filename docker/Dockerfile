@@ -1,9 +1,9 @@
-FROM python:3.12-bullseye as python-base
+FROM python:3.12-alpine as poetry-base
 ENV POETRY_HOME="/opt/poetry"
 RUN python -m venv ${POETRY_HOME} \
     && ${POETRY_HOME}/bin/pip install --no-cache-dir poetry
 
-FROM python-base as builder
+FROM poetry-base as builder
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
 RUN ${POETRY_HOME}/bin/poetry export -f requirements.txt --without-hashes -o requirements.txt \
