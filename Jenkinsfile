@@ -58,7 +58,6 @@ pipeline {
         BUILD_TITLE = ''
         DURATION = ''
         DISCORD_USERNAME = 'ChaserLand CI'
-        CHASERLAND_GRPC_USER_SERVICE_WORKSPACE = "${WORKSPACE}"
     }
     stages {
         stage('pre-build') {
@@ -92,15 +91,12 @@ pipeline {
             when {
                 branch 'dev'
             }
-            environment {
-                CHASERLAND_GRPC_USER_SERVICE_VERSION = "${VERSION}"
-            }
             steps {
                 script{
                     setLastStage()
                 }
                 echo "Start building ${BRANCH_NAME} branch..."
-                sh 'docker compose -f $DOCKER_CONFIG_FILE -p $DOCKER_PROJECT build chaserland-grpc-user-service'
+                sh "docker build -t chaserland/chaserland-grpc-user-service:${VERSION} -f ${WORKSPACE}/docker/Dockerfile ${WORKSPACE}"
                 echo "Finish building ${BRANCH_NAME} branch!"
 
                 echo "Replace the latest image tag with the current commit sha..."
@@ -141,19 +137,16 @@ pipeline {
             when {
                 branch 'feature/docker'
             }
-            environment {
-                CHASERLAND_GRPC_USER_SERVICE_VERSION = "test-${COMMIT_SHA}"
-            }
             steps {
                 script{
                     setLastStage()
                 }
                 echo "Start building ${BRANCH_NAME} branch..."
-                sh 'docker compose -f $DOCKER_CONFIG_FILE -p $DOCKER_PROJECT build chaserland-grpc-user-service'
+                sh "docker build -t chaserland/chaserland-grpc-user-service:test-${COMMIT_SHA} -f ${WORKSPACE}/docker/Dockerfile ${WORKSPACE}"
                 echo "Finish building ${BRANCH_NAME} branch!"
 
                 echo "Replace the latest image tag with the current commit sha..."
-                sh "docker tag chaserland/chaserland-grpc-user-service:${CHASERLAND_GRPC_USER_SERVICE_VERSION} chaserland/chaserland-grpc-user-service:test"
+                sh "docker tag chaserland/chaserland-grpc-user-service:test-${COMMIT_SHA} chaserland/chaserland-grpc-user-service:test"
                 echo "Finish replacing the latest image tag with the current commit sha!"
 
                 echo "Clear outdated images..."
