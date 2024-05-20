@@ -16,3 +16,4 @@ docker/
 logs/
 tests/
 .env
+README.md
