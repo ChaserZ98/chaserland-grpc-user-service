@@ -1,4 +1,5 @@
 FROM python:3.12-alpine as poetry-base
+RUN apk add --no-cache git
 ENV POETRY_HOME="/opt/poetry"
 RUN python -m venv ${POETRY_HOME} \
     && ${POETRY_HOME}/bin/pip install --no-cache-dir poetry
